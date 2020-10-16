@@ -1,7 +1,4 @@
-CREATE TABLE cats
-    (
-        cat_id INT NOT NULL AUTO_INCREMENT,
-        name VARCHAR(100),
-        age INT,
-        PRIMARY KEY(cat_id)
-    );
+-- list papers only with their students in the format first_name, last_name, title, grade. Ordered in grade in descending order
+select
+		first_name, last_name,
+from papers inner join students on students.id=papers.student_id

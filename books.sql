@@ -53,7 +53,7 @@ INSERT INTO books
            ('fake_book', 'Freida', 'Harris', 2001, 287, 428),
            ('Lincoln In The Bardo', 'George', 'Saunders', 2017, 1000, 367);
 
-INSERT INTO customers (first_name, last_name, email) 
+INSERT INTO customers (first_name, last_name, email)
 VALUES ('Boy', 'George', 'george@gmail.com'),
        ('George', 'Michael', 'gm@gmail.com'),
        ('David', 'Bowie', 'david@gmail.com'),
