@@ -1764,3 +1764,28 @@ select  (select count(*) from photos)
 show triggers;
 drop trigger cannot_follow_oneself
 -- triggers can make debugging hard!!
+
+-- Section: Transactions & Isolation Levels at MySQL
+-- Tutorial: https://www.youtube.com/watch?v=4EajrPgJAk0
+select @@transaction_isolation;  --> returns currently set transaction isolation level for the console session
+    -- By default it is REPEATABLE-READ
+
+select @@global.transaction_isolation;  -- global isolation level, which applies to all sessions when they start
+    -- By default it is REPEATABLE-READ as well
+
+set session transaction isolation level read uncommitted;
+
+-- Use bank_db for the upcoming examples
+create table accounts (
+    id int primary key not null auto_increment,
+    owner varchar(100) not null,
+    balance decimal(65, 2) not null default 0.0,
+    currency varchar(10),
+    created_at datetime default now()
+);
+
+insert into accounts (owner, balance, currency)
+values ('one', 100.0, 'USD'),
+       ('two', 100.0, 'USD'),
+       ('three', 100.0, 'USD');
+
