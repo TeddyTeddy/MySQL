@@ -236,7 +236,7 @@ select * from cats
     create database shirts_db
     use shirts_db
     create table shirts (
-      shirt_id int primary key auto_increment,
+      shirt_id int primary key auto_increment not null,
       article varchar(100) not null,
       color varchar(100) not null,
       shirt_size varchar(5) not null,
@@ -286,6 +286,14 @@ select * from cats
 
 
 -- SECTION 7: STRING FUNCTIONS in MySQL
+
+-- LECTURE 97:
+-- How to run command mysql command line cli in terminal?
+-- /user/bin/mysql  -u root -p
+-- How to run cats.sql on mysql command line client?
+-- source cats.sql
+
+-- String Functions in MySQL:
 -- https://dev.mysql.com/doc/refman/8.0/en/string-functions.html
 
 -- Important: string functions, only change the query output,
@@ -306,7 +314,7 @@ select * from cats
        -- indexing start with 1, not 0
        -- reading [starting_index, ending_index], from left to right
        -- ending_index is optional, if not given, reading till the end of string
-       -- minus index is read from the end of the string to the beginning: i.e. -3 is 3rd last character
+       -- minus index is read from the end of the string to the end: i.e. -3 is 3rd last character
       select substring('Hello world', 1, 4) -- Hell
       select substring('Hello world', 7)  -- world
       select substring('Hello world', -3)  -- rld
@@ -444,7 +452,7 @@ select * from cats
       concat(stock_quantity, ' in stock') as 'quantity'
     from books
 
--- SECTION: Making more detailed SELECT statements
+-- SECTION 8: Making more detailed SELECT statements
 -- Lecture 118: DISTINCT & SELECT
     select author_lname from books            -- 2 authors with lname Harris
     select distinct author_lname from books
@@ -491,8 +499,8 @@ select * from cats
     order by released_year desc limit 5
     -- List 0.th to 4.th book (inclusive) ordered by released_year
     select title, released_year from books order by released_year desc limit 0,5  -- start from 0.th book, pick 5 books (i.e. pagination)
-    -- List 6.th book to the end of list ordered by released year
-    select title from books limit 5, 18383939292  -- start index 5 (6.th book), all the way to the end
+    -- List 6.th book to the end of list ordered by released year descending
+    select title, released_year from books order by released_year desc limit 5, 18383939292  -- start index 5 (6.th book), all the way to the end
     -- General formula from x.th to to the end of list
     select * FROM <tablename> LIMIT 95,18446744073709551615
 
@@ -754,7 +762,7 @@ select * from cats
     VALUES('Larry', '1943-12-25', '04:10:42', '1943-12-25 04:10:42');
 
     insert into people(name, birthdate, birthtime, birthdt)
-    values ('Hakan', '1978-04-27', '04:00:00', '1978-04-27 04:00:00')
+    values ('Hakan', '1978-04-27', '04:00:00', '1978-04-27 04:00:00');
 
 -- Lecture 161: CURDATE, CURTIME and NOW functions
     --CURDATE() - gives current date
@@ -799,8 +807,8 @@ select * from cats
           from people
 
           -- or much better
-          select date_format(birthdt, '%M %D %Y') from people
-          select date_format(birthdt, '%e/%c/%Y at %h:%m') from people
+          select date_format(birthdt, '%M %D %Y') from people;
+          select date_format(birthdt, '%e/%c/%Y at %h:%i') from people;
           -- more info about DATEFORMAT
           -- https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html#function_date-format
 
@@ -827,7 +835,7 @@ select * from cats
                              + interval timestampdiff(year, birthdt, now()) year
                              + interval timestampdiff(month, birthdt + interval timestampdiff(year, birthdt, now()) year, now()) month,
                          now()) as 'days'
-        from people
+        from people;
         -- verify it from: https://www.agecalculatorguru.com/
 
 -- Lecture 167: DATETIME and TIMESTAMP Data Types
@@ -841,9 +849,9 @@ select * from cats
      create table comments (
 	      content varchar(100),
         created_at timestamp default now()
-      )
-      insert into comments(content) values('lol, funny article')
-      insert into comments(content) values('this is interesting')
+      );
+      insert into comments(content) values('lol, funny article');
+      insert into comments(content) values('this is interesting');
 
      create table comments2 (
 	      content varchar(100),
@@ -851,16 +859,16 @@ select * from cats
         changed_at timestamp default now() on update current_timestamp  --> current_timestamp / now()
       )
 
-      insert into comments2(content) values('Cool!')
-      insert into comments2(content) values('Interesting!')
-      select * from comments2
-      update comments2 set content='I love this!' where content='Interesting!'
-      select * from comments2
+      insert into comments2(content) values('Cool!');
+      insert into comments2(content) values('Interesting!');
+      select * from comments2;
+      update comments2 set content='I love this!' where content='Interesting!';
+      select * from comments2;
     -- ??? How to replace love with like?
         -- https://stackoverflow.com/questions/10177208/update-a-column-value-replacing-part-of-a-string
-        update comments2 set content=replace(content, 'love', 'like')
+        update comments2 set content=replace(content, 'love', 'like');
 
--- Lecture 169: EXERCISES DATA_TYPES
+-- Lecture 172: EXERCISES DATA_TYPES
    -- char vs varchar
    -- int vs decimal
    -- decimal vs float & double
@@ -1126,19 +1134,19 @@ select * from cats
 -- One to Many Relationship : foreign key
   -- i.e. a customer & orders
   create table customers (
-      id int primary key auto_increment,
+      id int primary key	auto_increment not null,
       first_name varchar(100) not null,
       last_name varchar(100) not null,
-      email varchar(100) not null
-  )
+      email varchar(320) not null
+  );
 
-  create table orders(
-      id int primary key auto_increment,
-      order_date date not null,
-      amount decimal(8,2) not null default 0.00,
+  create table orders (
+      id int primary key auto_increment not null,
+      order_date	date not null,
+      amount	decimal(8,2) not null default 0.00,
       customer_id int not null,
       foreign key(customer_id) references customers(id)
-  )
+  );
 
   INSERT INTO customers (first_name, last_name, email)
   VALUES ('Boy', 'George', 'george@gmail.com'),
@@ -1174,18 +1182,21 @@ select * from cats
       -- explicit inner join to achive the same result
       select * from customers inner join orders on customers.id = orders.customer_id
 
-    -- implicit inner join;
+    -- implicit inner join #1;
     select first_name, last_name, order_date, amount from customers, orders where customers.id = orders.customer_id
+    -- implicit inner join #2;
+    select first_name, last_name, order_date, amount from customers cross join orders on customers.id = orders.customer_id
+    where first_name='Boy' and last_name='George';
       -- explicit inner join using <TableA> INNER JOIN <TableB> ON <condition> (preferred)
       select first_name, last_name, order_date, amount from customers inner join orders on customers.id = orders.customer_id
-
+      where first_name='Boy' and last_name='George';
     -- Lecture 204:
     -- can use ordering/functions/operators/groups on the joint table. Examples:
         select
               first_name, last_name, order_date, amount
         from customers join orders
               on customers.id = orders.customer_id
-        order by amount
+        order by amount asc;
 
         -- Find the customer that spent the most money in first_name, last_name, total_spent
           select
@@ -1195,14 +1206,14 @@ select * from cats
           from customers
           join orders on customers.id = orders.customer_id
           group by customers.id
-            order by total_spent desc limit 1
+          order by total_spent desc limit 1;
 
   -- LEFT JOIN
     -- https://dataschool.com/how-to-teach-people-sql/left-right-join-animated/
     -- Outcome of LEFT JOIN is a new table containing fields fom Table A and Table B
     -- Select everything from table A (e.g. customers), along with any matching records in table B (e.g. orders)
     -- IF there are records in table A that do not have any match in B, then set NULL to corresponding the fields
-    -- into the corresponding fields in the outcome table
+    -- in the join table
     select * from customers left join orders on customers.id = orders.customer_id
     select first_name, last_name, order_date, amount from customers left join orders on customers.id = orders.customer_id
     -- When to use a left join?
@@ -1231,7 +1242,7 @@ select * from cats
 
 -- Lecture 206/208: RIGHT JOIN
     -- Select everything from B (e.g. orders), along with any matching records in A (e.g. customer)
-    select * from customers right join orders on customers.id = orders.customer_id
+    select * from customers right join orders on customers.id = orders.customer_id;
 
 -- Lecture 208: ON DELETE CASCADE
     -- If we have a foreign key relationship when we delete a parent (e.g. a customer),
@@ -1268,6 +1279,10 @@ select * from cats
     RIGHT JOIN orders
         ON customers.id = orders.customer_id;
 
+    -- In summary;
+    -- A left join B  ==  B right join A
+    -- A right join B  == B left join A
+
 -- Lecture 212 & 215: EXERCISES: 1 to Many : Joints
     create table students (
       id int not null primary key auto_increment,
@@ -1300,23 +1315,23 @@ select * from cats
     -- list papers only with their students in the format first_name, title, grade. Ordered in grade in descending order
     select first_name, last_name, title, grade
     from students inner join papers on students.id = papers.student_id
-    order by grade desc
+    order by grade desc;
 
     -- list ALL students with their papers if any, if no paper then show null in paper's fields
     select first_name, last_name, title, grade
-    from students left join papers on students.id = papers.student_id
+    from students left join papers on students.id = papers.student_id;
 
     -- list ALL students with their papers if any, if no paper then show MISSING in title and 0 in grade. Ordered in grade in descending order
     select first_name, last_name,
            ifnull(title, 'MISSING') as 'title',
            ifnull(grade, 0.00) as 'grade' from students
     left join papers on students.id = papers.student_id
-    order by grade desc
+    order by grade desc;
 
     -- What does this do ???
-      -- It picks random entries from grouped tables and if the grade is not null it shows it as it is, otherwise it shows 0.00
+      -- It picks random entries from grouped tables and if the grade is not null it shows it as it is, otherwise it shows 0
     select first_name, last_name,
-      ifnull(grade, 0.00) as 'grade'  --> note that no aggregate function (e.g avg) is used
+      ifnull(grade, 0) as 'grade'  --> note that no aggregate function (e.g avg) is used
     from students left join papers on students.id = papers.student_id
     group by students.id
 
@@ -1424,6 +1439,7 @@ select * from cats
     select
       title, rating
     from series inner join reviews on series.id = reviews.series_id
+    order by title asc;
 
 -- Lecture 223: Exercise 2:
     -- title, avg_rating
@@ -1433,7 +1449,7 @@ select * from cats
       title, avg(rating) as average_rating
     from series inner join reviews on series.id=reviews.series_id
     group by series.id
-    order by average_rating asc
+    order by average_rating asc;
 
 -- Lecture 225: Exercise 3:
 	-- first_name, last_name, rating
@@ -1441,6 +1457,7 @@ select * from cats
     select first_name, last_name, rating
     from reviewers inner join reviews
       on reviewers.id = reviews.reviewer_id
+      order by reviewers.id asc;
 
 -- Lecture 227 : Exercise 4:
 	-- unreviewed_series
@@ -1449,7 +1466,7 @@ select * from cats
     select
       title as unreviewed_series
     from series left join reviews on series.id=reviews.series_id
-    where reviews.id is null
+    where reviews.id is null;
 
 -- Lecture 229: Exercise 5:
 	-- genre, avg_rating
@@ -1475,7 +1492,7 @@ select * from cats
           else 'ACTIVE'
         end as 'STATUS'
     from reviewers left join reviews on reviewers.id = reviews.reviewer_id
-    group by reviewers.id
+    group by reviewers.id;
 
 -- Lecture 231: Exercise 6: Version 2
 	-- first_name, last_name, COUNT, MIN, MAX, AVG, STATUS
@@ -1550,18 +1567,23 @@ select username from users order by created_at asc limit 5
 -- Lecture 258: Exercise 2:
 -- Q: What day of the week do most users register on?
     select
-      date_format(created_at, '%W') as 'DAY',
-      count(*) as 'TOTAL'
+      date_format(created_at, '%W') as 'WEEKDAY',
+        count(*) as num_of_registrations
     from users
-    group by DAY
-    order by TOTAL desc
+    group by WEEKDAY
+    order by num_of_registrations desc;
 
 -- Lecture 260: Exercise 3:
     -- Q: Find the users who have never posted a photo
     select username
     from users left join photos
       on users.id = photos.user_id
-    where image_url is null
+    where image_url is null;
+
+    select
+      username
+    from users left join photos on users.id = photos.user_id
+    where photos.id is null;
 
 -- Lecture 262: Exercise 4:
 -- Q: Who has got the most likes on a single photo?
@@ -1578,63 +1600,47 @@ select username from users order by created_at asc limit 5
     group by photos.id
     order by num_likes desc
 
-    -- a. Yields wrong result
-    -- # image_url, username, num_likes
-    -- 'https://jarret.name', 'Alexandro35', '48'
-    select
-        image_url,
-        users.username,
-        count(*) as 'num_likes'
-    from likes inner join photos
-      on likes.photo_id = photos.id
-    inner join users
-      on likes.user_id = users.id   --> this condition is wrong! Interested in users which liked the photos, not took the photos!
-    group by photos.id
-    order by num_likes desc limit 1
-
-    -- b. Is this working? NO!
-    -- # username, id, image_url, num_likes
-    -- 'Alexandro35', '145', 'https://jarret.name', '48'
-    select
-        users.username,
-        photos.id,
-        photos.image_url,
-        count(*) as 'num_likes'
-    from photos inner join likes
-        on photos.id = likes.photo_id
-    inner join users
-        on likes.user_id = users.id    --> this condition is wrong! Interested in users which liked the photos, not took the photos!
-    group by photos.id
-    order by num_likes desc limit 1
-
-    -- c. Correct solution
+-- Q: Who took the photo that has got the most likes?
     -- # image_url, username, num_Likes
     -- 'Zack_Kemmer93', 'https://jarret.name', '48'
-	  select
-          users.username,
-          photos.image_url,
-          count(*) as 'num_likes'
-    from photos inner join likes
-		      on photos.id = likes.photo_id
-	  inner join users
-		      on users.id = photos.user_id  --> this condition is correct! Interested in users who took the photos
-	  group by photos.id
-          order by num_likes desc limit 1
+    select
+        photos.id,
+        image_url,
+        username,
+        count(*) as num_of_likes
+    from photos
+    inner join likes on photos.id = likes.photo_id
+    inner join users on photos.user_id = users.id
+    group by photos.id
+    order by num_of_likes desc limit 1;
 
     -- Extra exercise not included in the lecture
+    -- Q: Which user made the most likes?
     select
-		username,
+		        username,
             count(*) as number_of_likes
     from users inner join likes on users.id = likes.user_id
 	  group by users.id
-    order by number_of_likes desc
+    order by number_of_likes desc;
 
 -- Exercise 5:
 -- Q: How many times does an average user post a photo?
    -- Sub Q: What is the average number of photos for all users?
       -- total num of photos / total num of users
 select  (select count(*) from photos)
-/ (select count(*) from users) as 'avg'
+/ (select count(*) from users) as avg_num_of_posts;
+
+-- OR
+    select 
+    sum(num_of_posts) / count(*) as avg_num_of_posts
+    from (select
+        username,
+        case
+         when image_url is null then 0
+            else count(*)
+        end as num_of_posts
+    from users left join photos on users.id = photos.user_id
+    group by users.id) as T;
 
 -- Exercise 6:
 -- Q: What are the top 5 most commonly used hashtags?
@@ -1667,23 +1673,22 @@ select  (select count(*) from photos)
 
   -- solution 1: by using HAVING
   select
-	    users.username,
-      count(*) as 'num_photos'
+		users.username as bots
   from users inner join likes
 	    on users.id = likes.user_id
   group by users.id
-      having num_photos = (select count(*) from photos)
+      having count(*) = (select count(*) from photos);
 
   -- solution 2: by using WHERE
-  select 	username,
-      number_of_photos_liked
-  from
-    (select
-      username,
-      count(*) as number_of_photos_liked
-    from users inner join likes on users.id = likes.user_id
-    group by users.id) as T
-  where number_of_photos_liked = (select count(*) from photos)
+  select
+    username as bots
+  from (select
+    username,
+      count(*) as num_of_likes
+  from users
+  inner join likes on users.id = likes.user_id
+  group by users.id) as T1
+  where num_of_likes = (select count(*) from photos);
 
 -- Section 18: TRIGGERS
 -- Lecture 316:

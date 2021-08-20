@@ -14,14 +14,14 @@ CREATE TABLE books
 	);
 
 create table customers (
-		id int primary key auto_increment,
+		id int primary key auto_increment not null,
         first_name varchar(100) not null,
         last_name varchar(100) not null,
         email varchar(100) not null
 );
 
 create table orders(
-        id int primary key auto_increment,
+        id int primary key auto_increment not null,
         order_date date,
         amount decimal(8,2) not null default 0.00,
         customer_id int,
@@ -47,6 +47,8 @@ VALUES
 ('Oblivion: Stories', 'David', 'Foster Wallace', 2004, 172, 329),
 ('Consider the Lobster', 'David', 'Foster Wallace', 2005, 92, 343);
 
+desc books;
+
 INSERT INTO books
     (title, author_fname, author_lname, released_year, stock_quantity, pages)
     VALUES ('10% Happier', 'Dan', 'Harris', 2014, 29, 256),
@@ -66,3 +68,4 @@ VALUES ('2016/02/10', 99.99, 1),
        ('2014/12/12', 800.67, 2),
        ('2015/01/03', 12.50, 2),
        ('1999/04/11', 450.25, 5);
+
